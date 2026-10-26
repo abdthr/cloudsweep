@@ -11,23 +11,25 @@ EBS_PRICE_PER_GB = {
 
 def find_unattached_volumes(region: str) -> list[dict]:
     ec2 = boto3.client("ec2", region_name=region)
+    paginator = ec2.get_paginator("describe_volumes")
     findings = []
 
-    for volume in ec2.describe_volumes()["Volumes"]:
-        if volume["State"] != "available":
-            continue
+    for page in paginator.paginate():
+        for volume in page["Volumes"]:
+            if volume["State"] != "available":
+                continue
 
-        price = EBS_PRICE_PER_GB.get(volume["VolumeType"])
-        if price is None:
-            monthly_cost = None
-        else:
-            monthly_cost = round(volume["Size"] * price, 2)
+            price = EBS_PRICE_PER_GB.get(volume["VolumeType"])
+            if price is None:
+                monthly_cost = None
+            else:
+                monthly_cost = round(volume["Size"] * price, 2)
 
-        findings.append({
-            "id": volume["VolumeId"],
-            "type": volume["VolumeType"],
-            "size_gb": volume["Size"],
-            "monthly_cost": monthly_cost,
-        })
+            findings.append({
+                "id": volume["VolumeId"],
+                "type": volume["VolumeType"],
+                "size_gb": volume["Size"],
+                "monthly_cost": monthly_cost,
+            })
 
     return findings
