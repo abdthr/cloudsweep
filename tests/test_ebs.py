@@ -25,7 +25,13 @@ def test_finds_unattached_volume_with_cost(ec2):
     findings = find_unattached_volumes(REGION)
 
     assert findings == [
-        {"id": volume["VolumeId"], "type": "gp3", "size_gb": 100, "monthly_cost": 8.0}
+        {
+            "id": volume["VolumeId"],
+            "region": REGION,
+            "type": "gp3",
+            "size_gb": 100,
+            "monthly_cost": 8.0,
+        }
     ]
 
 

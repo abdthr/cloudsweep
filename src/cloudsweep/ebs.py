@@ -27,6 +27,7 @@ def find_unattached_volumes(region: str) -> list[dict]:
 
             findings.append({
                 "id": volume["VolumeId"],
+                "region": region,
                 "type": volume["VolumeType"],
                 "size_gb": volume["Size"],
                 "monthly_cost": monthly_cost,
