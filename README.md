@@ -9,14 +9,21 @@ finds that kind of leftover and tells you roughly what it's costing you.
 ```
 $ cloudsweep scan --all-regions
 ...
-eu-north-1  vol-0e01dd418b516f0ab  gp3  100 GB  $8.00/month
-us-east-1   vol-0a7c3f19e2b84d561  gp2  500 GB  $50.00/month
+eu-north-1  EBS volume  vol-0e01dd418b516f0ab  gp3, 100 GB  $8.00/month
+us-east-1   EBS volume  vol-0a7c3f19e2b84d561  gp2, 500 GB  $50.00/month
+us-east-1   Elastic IP  eipalloc-07d4c1e9a2b3f5a68  3.91.24.17  $3.65/month
 
-Potential savings: $58.00/month
+Potential savings: $61.65/month
 ```
 
-For now cloudsweep only looks for unattached EBS volumes. It can scan a single
-region or every region your account has enabled.
+It can scan a single region or every region your account has enabled.
+
+## What it finds
+
+| Resource | Why it costs money |
+|---|---|
+| Unattached EBS volumes | Disks are billed per GB every month, even when nothing uses them |
+| Unused Elastic IPs | AWS charges for every public IPv4 address by the hour, attached or not |
 
 ## How it behaves
 
@@ -42,7 +49,8 @@ uv run cloudsweep scan --all-regions       # every region enabled for your accou
 uv run cloudsweep --help
 ```
 
-It only needs two read permissions: `ec2:DescribeVolumes` and `ec2:DescribeRegions`.
+It only needs read permissions: `ec2:DescribeVolumes`, `ec2:DescribeAddresses` and
+`ec2:DescribeRegions`.
 
 ## Tests
 
@@ -55,7 +63,7 @@ uv run pytest
 
 ## What's next
 
-- Find other things people forget about, like unused public IPs and old snapshots
+- Find other things people forget about, like old snapshots and logs that are kept forever
 - Publish it so you can `pip install cloudsweep`
 
 ## License
