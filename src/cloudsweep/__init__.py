@@ -5,6 +5,7 @@ import typer
 from botocore.exceptions import ClientError
 
 from cloudsweep.ebs import find_unattached_volumes
+from cloudsweep.eip import find_unused_elastic_ips
 from cloudsweep.regions import get_enabled_regions
 
 app = typer.Typer(
@@ -56,6 +57,8 @@ def scan(
         try:
             for f in find_unattached_volumes(r):
                 findings.append(f)
+            for f in find_unused_elastic_ips(r):
+                findings.append(f)
         except ClientError as error:
             code = error.response["Error"]["Code"]
             print(f"  Skipped {r}: {code}")
@@ -65,7 +68,7 @@ def scan(
         print(f"\nWarning: could not scan {len(skipped)} region(s): {', '.join(skipped)}")
 
     if not findings:
-        print("\nNo unattached EBS volumes found.")
+        print("\nNo forgotten resources found.")
         return
 
     print()
@@ -73,7 +76,7 @@ def scan(
     for f in findings:
         cost = f["monthly_cost"]
         cost_text = "unknown" if cost is None else f"${cost:.2f}/month"
-        print(f"{f['region']}  {f['id']}  {f['type']}  {f['size_gb']} GB  {cost_text}")
+        print(f"{f['region']}  {f['resource']}  {f['id']}  {f['details']}  {cost_text}")
         if cost is not None:
             total += cost
 

@@ -26,8 +26,10 @@ def test_finds_unattached_volume_with_cost(ec2):
 
     assert findings == [
         {
+            "resource": "EBS volume",
             "id": volume["VolumeId"],
             "region": REGION,
+            "details": "gp3, 100 GB",
             "type": "gp3",
             "size_gb": 100,
             "monthly_cost": 8.0,

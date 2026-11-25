@@ -26,8 +26,10 @@ def find_unattached_volumes(region: str) -> list[dict]:
                 monthly_cost = round(volume["Size"] * price, 2)
 
             findings.append({
+                "resource": "EBS volume",
                 "id": volume["VolumeId"],
                 "region": region,
+                "details": f"{volume['VolumeType']}, {volume['Size']} GB",
                 "type": volume["VolumeType"],
                 "size_gb": volume["Size"],
                 "monthly_cost": monthly_cost,
