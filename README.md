@@ -41,35 +41,38 @@ skips it, tells you which ones it missed and carries on with the rest.
 
 Costs are estimates based on approximate US prices, so treat them as a rough guide.
 
-## Usage
-
-You'll need [uv](https://docs.astral.sh/uv/) and AWS credentials (for example from `aws login`).
+## Install
 
 ```bash
-git clone https://github.com/abdthr/cloudsweep.git
-cd cloudsweep
-uv run cloudsweep scan                     # uses your default AWS region
-uv run cloudsweep scan --region us-east-1
-uv run cloudsweep scan --all-regions       # every region enabled for your account
-uv run cloudsweep scan --output json       # machine-readable, for scripts
-uv run cloudsweep --help
+pip install cloudsweep-aws
+```
+
+You'll need AWS credentials (for example from `aws login`).
+
+## Usage
+
+```bash
+cloudsweep scan                     # uses your default AWS region
+cloudsweep scan --region us-east-1
+cloudsweep scan --all-regions       # every region enabled for your account
+cloudsweep scan --output json       # machine-readable, for scripts
+cloudsweep --help
 ```
 
 It only needs read permissions: `ec2:DescribeVolumes`, `ec2:DescribeAddresses`,
 `ec2:DescribeRegions` and `logs:DescribeLogGroups`.
 
-## Tests
+## Development
 
-The tests use [moto](https://github.com/getmoto/moto) to fake AWS, so they don't
-need an account or cost anything.
+You'll need [uv](https://docs.astral.sh/uv/). The tests use [moto](https://github.com/getmoto/moto)
+to fake AWS, so they don't need an account or cost anything.
 
 ```bash
+git clone https://github.com/abdthr/cloudsweep.git
+cd cloudsweep
 uv run pytest
+uv run cloudsweep scan
 ```
-
-## What's next
-
-- Publish it so you can `pip install cloudsweep`
 
 ## License
 
