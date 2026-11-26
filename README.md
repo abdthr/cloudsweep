@@ -10,10 +10,13 @@ finds that kind of leftover and tells you roughly what it's costing you.
 ```
 $ cloudsweep scan --all-regions
 ...
-eu-north-1  EBS volume  vol-0e01dd418b516f0ab  gp3, 100 GB  $8.00/month
-us-east-1   EBS volume  vol-0a7c3f19e2b84d561  gp2, 500 GB  $50.00/month
-us-east-1   Elastic IP  eipalloc-07d4c1e9a2b3f5a68  3.91.24.17  $3.65/month
-
+┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Region     ┃ Resource   ┃ ID                         ┃ Details     ┃ Monthly cost ┃
+┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━━━┩
+│ us-east-1  │ EBS volume │ vol-0a7c3f19e2b84d561      │ gp2, 500 GB │       $50.00 │
+│ eu-north-1 │ EBS volume │ vol-0e01dd418b516f0ab      │ gp3, 100 GB │        $8.00 │
+│ us-east-1  │ Elastic IP │ eipalloc-07d4c1e9a2b3f5a68 │ 3.91.24.17  │        $3.65 │
+└────────────┴────────────┴────────────────────────────┴─────────────┴──────────────┘
 Potential savings: $61.65/month
 ```
 
@@ -65,7 +68,6 @@ uv run pytest
 
 ## What's next
 
-- Find other things people forget about, like old snapshots and stopped servers
 - Publish it so you can `pip install cloudsweep`
 
 ## License

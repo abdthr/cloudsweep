@@ -3,16 +3,25 @@ from importlib.metadata import version
 import boto3
 import typer
 from botocore.exceptions import ClientError
+from rich.console import Console
+from rich.table import Table
 
 from cloudsweep.ebs import find_unattached_volumes
 from cloudsweep.eip import find_unused_elastic_ips
-from cloudsweep.regions import get_enabled_regions
 from cloudsweep.logs import find_log_groups_without_retention
+from cloudsweep.regions import get_enabled_regions
 
 app = typer.Typer(
     help="Find forgotten AWS resources that are costing you money.",
     no_args_is_help=True,
 )
+
+
+def cost_for_sorting(finding: dict) -> float:
+    """Unknown costs count as 0, so they end up at the bottom."""
+    if finding["monthly_cost"] is None:
+        return 0.0
+    return finding["monthly_cost"]
 
 
 def show_version(value: bool) -> None:
@@ -74,13 +83,23 @@ def scan(
         print("\nNo forgotten resources found.")
         return
 
-    print()
+    findings = sorted(findings, key=cost_for_sorting, reverse=True)
+
+    table = Table()
+    table.add_column("Region")
+    table.add_column("Resource")
+    table.add_column("ID", no_wrap=True)
+    table.add_column("Details")
+    table.add_column("Monthly cost", justify="right")
+
     total = 0.0
     for f in findings:
         cost = f["monthly_cost"]
-        cost_text = "unknown" if cost is None else f"${cost:.2f}/month"
-        print(f"{f['region']}  {f['resource']}  {f['id']}  {f['details']}  {cost_text}")
+        cost_text = "unknown" if cost is None else f"${cost:.2f}"
+        table.add_row(f["region"], f["resource"], f["id"], f["details"], cost_text)
         if cost is not None:
             total += cost
 
-    print(f"\nPotential savings: ${total:.2f}/month")
+    print()
+    Console().print(table)
+    print(f"Potential savings: ${total:.2f}/month")
