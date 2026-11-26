@@ -1,3 +1,5 @@
+import json
+import sys
 from importlib.metadata import version
 
 import boto3
@@ -24,6 +26,35 @@ def cost_for_sorting(finding: dict) -> float:
     return finding["monthly_cost"]
 
 
+def print_message(text: str) -> None:
+    """Print progress and warnings to stderr, so they never mix with the results."""
+    print(text, file=sys.stderr)
+
+
+def print_table(findings: list[dict]) -> None:
+    if not findings:
+        print("No forgotten resources found.")
+        return
+
+    table = Table()
+    table.add_column("Region")
+    table.add_column("Resource")
+    table.add_column("ID", no_wrap=True)
+    table.add_column("Details")
+    table.add_column("Monthly cost", justify="right")
+
+    total = 0.0
+    for f in findings:
+        cost = f["monthly_cost"]
+        cost_text = "unknown" if cost is None else f"${cost:.2f}"
+        table.add_row(f["region"], f["resource"], f["id"], f["details"], cost_text)
+        if cost is not None:
+            total += cost
+
+    Console().print(table)
+    print(f"Potential savings: ${total:.2f}/month")
+
+
 def show_version(value: bool) -> None:
     if value:
         print(f"cloudsweep {version('cloudsweep')}")
@@ -47,12 +78,19 @@ def scan(
     all_regions: bool = typer.Option(
         False, "--all-regions", help="Scan every region enabled for your account."
     ),
+    output: str = typer.Option(
+        "table", "--output", "-o", help="How to show the results: table or json."
+    ),
 ) -> None:
     """Scan for forgotten resources and estimate what they cost per month."""
+    if output not in ["table", "json"]:
+        print_message(f"Unknown output format '{output}'. Use table or json.")
+        raise typer.Exit(code=2)
+
     if region is None:
         region = boto3.Session().region_name
     if region is None:
-        print("No region given. Use --region, or set one with: aws configure set region <region>")
+        print_message("No region given. Use --region, or set one with: aws configure set region <region>")
         raise typer.Exit(code=2)
 
     if all_regions:
@@ -63,7 +101,7 @@ def scan(
     findings = []
     skipped = []
     for r in regions_to_scan:
-        print(f"Scanning {r}...")
+        print_message(f"Scanning {r}...")
         try:
             for f in find_unattached_volumes(r):
                 findings.append(f)
@@ -73,33 +111,16 @@ def scan(
                 findings.append(f)
         except ClientError as error:
             code = error.response["Error"]["Code"]
-            print(f"  Skipped {r}: {code}")
+            print_message(f"  Skipped {r}: {code}")
             skipped.append(r)
 
     if skipped:
-        print(f"\nWarning: could not scan {len(skipped)} region(s): {', '.join(skipped)}")
-
-    if not findings:
-        print("\nNo forgotten resources found.")
-        return
+        print_message(f"Warning: could not scan {len(skipped)} region(s): {', '.join(skipped)}")
 
     findings = sorted(findings, key=cost_for_sorting, reverse=True)
 
-    table = Table()
-    table.add_column("Region")
-    table.add_column("Resource")
-    table.add_column("ID", no_wrap=True)
-    table.add_column("Details")
-    table.add_column("Monthly cost", justify="right")
-
-    total = 0.0
-    for f in findings:
-        cost = f["monthly_cost"]
-        cost_text = "unknown" if cost is None else f"${cost:.2f}"
-        table.add_row(f["region"], f["resource"], f["id"], f["details"], cost_text)
-        if cost is not None:
-            total += cost
-
-    print()
-    Console().print(table)
-    print(f"Potential savings: ${total:.2f}/month")
+    if output == "json":
+        print(json.dumps(findings, indent=2))
+    else:
+        print_message("")
+        print_table(findings)

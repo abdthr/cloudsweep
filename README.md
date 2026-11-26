@@ -51,6 +51,7 @@ cd cloudsweep
 uv run cloudsweep scan                     # uses your default AWS region
 uv run cloudsweep scan --region us-east-1
 uv run cloudsweep scan --all-regions       # every region enabled for your account
+uv run cloudsweep scan --output json       # machine-readable, for scripts
 uv run cloudsweep --help
 ```
 
