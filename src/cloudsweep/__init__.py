@@ -7,6 +7,7 @@ from botocore.exceptions import ClientError
 from cloudsweep.ebs import find_unattached_volumes
 from cloudsweep.eip import find_unused_elastic_ips
 from cloudsweep.regions import get_enabled_regions
+from cloudsweep.logs import find_log_groups_without_retention
 
 app = typer.Typer(
     help="Find forgotten AWS resources that are costing you money.",
@@ -58,6 +59,8 @@ def scan(
             for f in find_unattached_volumes(r):
                 findings.append(f)
             for f in find_unused_elastic_ips(r):
+                findings.append(f)
+            for f in find_log_groups_without_retention(r):
                 findings.append(f)
         except ClientError as error:
             code = error.response["Error"]["Code"]

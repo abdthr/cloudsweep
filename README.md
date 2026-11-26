@@ -24,6 +24,7 @@ It can scan a single region or every region your account has enabled.
 |---|---|
 | Unattached EBS volumes | Disks are billed per GB every month, even when nothing uses them |
 | Unused Elastic IPs | AWS charges for every public IPv4 address by the hour, attached or not |
+| Log groups that never expire | CloudWatch keeps logs forever by default, and you pay for every GB stored |
 
 ## How it behaves
 
@@ -49,8 +50,8 @@ uv run cloudsweep scan --all-regions       # every region enabled for your accou
 uv run cloudsweep --help
 ```
 
-It only needs read permissions: `ec2:DescribeVolumes`, `ec2:DescribeAddresses` and
-`ec2:DescribeRegions`.
+It only needs read permissions: `ec2:DescribeVolumes`, `ec2:DescribeAddresses`,
+`ec2:DescribeRegions` and `logs:DescribeLogGroups`.
 
 ## Tests
 
@@ -63,7 +64,7 @@ uv run pytest
 
 ## What's next
 
-- Find other things people forget about, like old snapshots and logs that are kept forever
+- Find other things people forget about, like old snapshots and stopped servers
 - Publish it so you can `pip install cloudsweep`
 
 ## License
