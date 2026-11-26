@@ -1,8 +1,11 @@
 [project]
-name = "cloudsweep"
-version = "0.1.0"
-description = "Add your description here"
+name = "cloudsweep-aws"
+version = "1.0.0"
+description = "Find forgotten AWS resources that are costing you money."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["aws", "cost", "cloud", "cli", "finops"]
 authors = [
     { name = "Abdullah Tahir", email = "157417306+abdthr@users.noreply.github.com" }
 ]
@@ -13,12 +16,19 @@ dependencies = [
     "typer>=0.27.3",
 ]
 
+[project.urls]
+Homepage = "https://github.com/abdthr/cloudsweep"
+Issues = "https://github.com/abdthr/cloudsweep/issues"
+
 [project.scripts]
 cloudsweep = "cloudsweep:app"
 
 [build-system]
 requires = ["uv_build>=0.12.21,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "cloudsweep"
 
 [dependency-groups]
 dev = [

@@ -307,8 +307,8 @@ wheels = [
 ]
 
 [[package]]
-name = "cloudsweep"
-version = "0.1.0"
+name = "cloudsweep-aws"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "boto3", extra = ["crt"] },

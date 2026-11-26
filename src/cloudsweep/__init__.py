@@ -57,7 +57,7 @@ def print_table(findings: list[dict]) -> None:
 
 def show_version(value: bool) -> None:
     if value:
-        print(f"cloudsweep {version('cloudsweep')}")
+        print(f"cloudsweep {version('cloudsweep-aws')}")
         raise typer.Exit()
 
 
