@@ -1,7 +1,5 @@
 # cloudsweep
-[![Tests]
-(https://github.com/abdthr/cloudsweep/actions/workflows/tests.yml/badge.svg)]
-(https://github.com/abdthr/cloudsweep/actions/workflows/tests.yml)
+[![Tests](https://github.com/abdthr/cloudsweep/actions/workflows/tests.yml/badge.svg)](https://github.com/abdthr/cloudsweep/actions/workflows/tests.yml)
 
 Find forgotten AWS resources that are costing you money.
 
